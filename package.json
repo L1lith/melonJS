@@ -39,6 +39,7 @@
   },
   "main": "dist/melonjs.module.js",
   "module": "dist/melonjs.module.js",
+  "types": "dist/melonjs.module.d.ts",
   "files": [
     "dist/melonjs.module.js",
     "dist/melonjs.module.d.ts",
@@ -58,7 +59,7 @@
   "devDependencies": {
     "@fastify/static": "^6.5.0",
     "@melonjs/webdoc-theme": "^1.1.1",
-    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-image": "^2.1.1",
     "@rollup/plugin-node-resolve": "^14.1.0",
     "@rollup/plugin-replace": "^4.0.0",
@@ -70,7 +71,7 @@
     "eslint": "^8.25.0",
     "expect": "^29.1.2",
     "expect-mocha-image-snapshot": "^2.0.14",
-    "fastify": "^4.7.0",
+    "fastify": "^4.8.1",
     "mocha": "^10.0.0",
     "npm-self-link": "^1.1.7",
     "puppeteer": "^18.2.1",
@@ -87,7 +88,7 @@
     "dist": "npm run build && mkdirp dist && cp -f build/*.js dist/ && npm run types",
     "lint": "eslint src rollup.config.js",
     "pretest": "cp -f ./build/melonjs.module.js ./tests/browser/public/lib",
-    "test": "mocha ./tests/browser/spec/*.js --reporter spec --bail --timeout 10000",
+    "test": "npm run test-node && mocha ./tests/browser/spec/*.js --reporter spec --bail --timeout 10000",
     "test-node": "node build/melonjs.module.js",
     "doc-prod": "mkdirp docs && webdoc --quiet --site-root melonJS/docs -R README.md",
     "doc-local": "mkdirp docs && webdoc --quiet --site-root /docs -R README.md",
@@ -95,6 +96,6 @@
     "serve": "python3 -m http.server",
     "prepublishOnly": "npm run dist && npm run test",
     "clean": "del-cli --force build/*.js dist/*.js dist/*.d.ts docs src/**/*.d.ts",
-    "types": "tsc dist/melonjs.module.js --declaration --allowJs --emitDeclarationOnly"
+    "types": "tsc src/index.js --declaration --allowJs --emitDeclarationOnly --outfile dist/melonjs.module.d.ts"
   }
 }

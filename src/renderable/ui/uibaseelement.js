@@ -1,58 +1,27 @@
-import timer from "./../system/timer.js";
-import Sprite from "./sprite.js";
-import { registerPointerEvent, releasePointerEvent} from "./../input/input.js";
-
+import Container from "./../container.js";
+import timer from "../../system/timer.js";
+import { registerPointerEvent, releasePointerEvent} from "./../../input/input.js";
 
 /**
  * @classdesc
- * GUI Object<br>
- * A very basic object to manage GUI elements <br>
- * The object simply register on the "pointerdown" <br>
- * or "touchstart" event and call the onClick function"
- * @augments Sprite
+ * This is a basic clickable container which you can use in your game UI.
+ * Use this for example if you want to display a button which contains
+ * text and images.
+ * @augments Container
  */
-class GUI_Object extends Sprite {
+class UIBaseElement extends Container {
     /**
-     * @param {number} x the x coordinate of the GUI Object
-     * @param {number} y the y coordinate of the GUI Object
-     * @param {object} settings See {@link Sprite}
-     * @example
-     * // create a basic GUI Object
-     * class myButton extends GUI_Object {
-     *    constructor(x, y) {
-     *       var settings = {}
-     *       settings.image = "button";
-     *       settings.framewidth = 100;
-     *       settings.frameheight = 50;
-     *       // super constructor
-     *       super(x, y, settings);
-     *       // define the object z order
-     *       this.pos.z = 4;
-     *    }
      *
-     *    // output something in the console
-     *    // when the object is clicked
-     *    onClick:function (event) {
-     *       console.log("clicked!");
-     *       // don't propagate the event
-     *       return false;
-     *    }
-     * });
-     *
-     * // add the object at pos (10,10)
-     * me.game.world.addChild(new myButton(10,10));
+     * @param {number} x The x position of the container
+     * @param {number} y The y position of the container
+     * @param {number} w width of the container (default: viewport width)
+     * @param {number} h height of the container (default: viewport height)
      */
-    constructor(x, y, settings) {
-
-        // call the parent constructor
-        super(x, y, settings);
-
+    constructor(x, y, w, h) {
+        super(x, y, w, h);
         /**
          * object can be clicked or not
-         * @public
          * @type {boolean}
-         * @default true
-         * @name GUI_Object#isClickable
          */
         this.isClickable = true;
 
@@ -60,25 +29,20 @@ class GUI_Object extends Sprite {
          * Tap and hold threshold timeout in ms
          * @type {number}
          * @default 250
-         * @name GUI_Object#holdThreshold
          */
         this.holdThreshold = 250;
 
         /**
          * object can be tap and hold
-         * @public
          * @type {boolean}
          * @default false
-         * @name GUI_Object#isHoldable
          */
         this.isHoldable = false;
 
         /**
          * true if the pointer is over the object
-         * @public
          * @type {boolean}
          * @default false
-         * @name GUI_Object#hover
          */
         this.hover = false;
 
@@ -106,7 +70,11 @@ class GUI_Object extends Sprite {
                 if (this.holdTimeout !== null) {
                     timer.clearTimeout(this.holdTimeout);
                 }
-                this.holdTimeout = timer.setTimeout(this.hold.bind(this), this.holdThreshold, false);
+                this.holdTimeout = timer.setTimeout(
+                    this.hold.bind(this),
+                    this.holdThreshold,
+                    false
+                );
                 this.released = false;
             }
             return this.onClick(event);
@@ -115,9 +83,6 @@ class GUI_Object extends Sprite {
 
     /**
      * function called when the object is pressed (to be extended)
-     * @name onClick
-     * @memberof GUI_Object
-     * @public
      * @param {Pointer} event the event object
      * @returns {boolean} return false if we need to stop propagating the event
      */
@@ -137,9 +102,6 @@ class GUI_Object extends Sprite {
 
     /**
      * function called when the pointer is over the object
-     * @name onOver
-     * @memberof GUI_Object
-     * @public
      * @param {Pointer} event the event object
      */
     onOver(event) { // eslint-disable-line no-unused-vars
@@ -159,9 +121,6 @@ class GUI_Object extends Sprite {
 
     /**
      * function called when the pointer is leaving the object area
-     * @name onOut
-     * @memberof GUI_Object
-     * @public
      * @param {Pointer} event the event object
      */
     onOut(event) { // eslint-disable-line no-unused-vars
@@ -183,9 +142,6 @@ class GUI_Object extends Sprite {
 
     /**
      * function called when the object is pressed and released (to be extended)
-     * @name onRelease
-     * @memberof GUI_Object
-     * @public
      * @returns {boolean} return false if we need to stop propagating the event
      */
     onRelease() {
@@ -207,9 +163,6 @@ class GUI_Object extends Sprite {
     /**
      * function called when the object is pressed and held<br>
      * to be extended <br>
-     * @name onHold
-     * @memberof GUI_Object
-     * @public
      */
     onHold() {}
 
@@ -219,9 +172,17 @@ class GUI_Object extends Sprite {
      */
     onActivateEvent() {
         // register pointer events
-        registerPointerEvent("pointerdown", this, this.clicked.bind(this));
+        registerPointerEvent(
+            "pointerdown",
+            this,
+            this.clicked.bind(this)
+        );
         registerPointerEvent("pointerup", this, this.release.bind(this));
-        registerPointerEvent("pointercancel", this, this.release.bind(this));
+        registerPointerEvent(
+            "pointercancel",
+            this,
+            this.release.bind(this)
+        );
         registerPointerEvent("pointerenter", this, this.enter.bind(this));
         registerPointerEvent("pointerleave", this, this.leave.bind(this));
     }
@@ -232,7 +193,7 @@ class GUI_Object extends Sprite {
      */
     onDeactivateEvent() {
         // release pointer events
-        releasePointerEvent("pointerdown", this);
+        releasePointerEvent("pointerdown", this.hitbox);
         releasePointerEvent("pointerup", this);
         releasePointerEvent("pointercancel", this);
         releasePointerEvent("pointerenter", this);
@@ -240,5 +201,4 @@ class GUI_Object extends Sprite {
         timer.clearTimeout(this.holdTimeout);
     }
 }
-
-export default GUI_Object;
+export default UIBaseElement;
